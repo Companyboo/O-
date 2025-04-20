@@ -1,4 +1,4 @@
-name: Check OEM Kernel Repo for Updates
+name: Check OEM Kernel Manifest for Updates
 
 permissions:
   contents: write
@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  kernel-check:
+  check-oem-updates:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout self
@@ -19,16 +19,16 @@ jobs:
       - name: Restore last seen commit from cache
         uses: actions/cache@v3
         with:
-          path: .last_kernel_commit
-          key: "kernel-commit"
+          path: .last_oem_commit
+          key: "oem-commit"
 
-      - name: Check for new commit in Kernel repo
+      - name: Check for new commit in OEM repo
         id: check
         run: |
-          LATEST_COMMIT=$(curl -s https://api.github.com/repos/OnePlusOSS/android_kernel_common_oneplus_sm8650/commits?sha=oneplus/sm8650_v_15.0.0_oneplus_13r | jq -r '.[0].sha')
-          echo "Latest Kernel Commit: $LATEST_COMMIT"
+          LATEST_COMMIT=$(curl -s https://api.github.com/repos/OnePlusOSS/kernel_manifest/commits?sha=oneplus/sm8650 | jq -r '.[0].sha')
+          echo "Latest OEM Commit: $LATEST_COMMIT"
 
-          CACHE_PATH=".last_kernel_commit"
+          CACHE_PATH=".last_oem_commit"
           if [ -f "$CACHE_PATH" ]; then
             LAST_COMMIT=$(cat $CACHE_PATH)
           else
@@ -50,7 +50,7 @@ jobs:
       #   uses: benc-uk/workflow-dispatch@v1
       #   with:
       #     workflow: build-kernel-release.yml
-      #     ref: op13
+      #     ref: op13r
       #     inputs: '{ "make_release": "true" }'
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.MY_PAT }}
@@ -59,5 +59,5 @@ jobs:
         if: steps.check.outputs.changed == 'true'
         uses: actions/cache@v3
         with:
-          path: .last_kernel_commit
-          key: "kernel-commit"
+          path: .last_oem_commit
+          key: "oem-commit"
