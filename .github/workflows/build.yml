@@ -213,8 +213,7 @@ jobs:
           
           # ── Additional Netfilter Options ──
           echo "CONFIG_WIREGUARD=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_IP_NF_NAT=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_UNMAP_KERNEL_AT_EL0=y" >> common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_IP_NF_NAT=y" >> common/arch/arm64/configs/gki_defconfig          
 
           # ── Power & idle optimizations ──
           echo "CONFIG_NO_HZ_IDLE=y" >> common/arch/arm64/configs/gki_defconfig
