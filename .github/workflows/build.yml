@@ -207,9 +207,7 @@ jobs:
 
           # ── I/O Schedulers ──          
           echo "CONFIG_IOSCHED_BFQ=y" >> common/arch/arm64/configs/gki_defconfig         
-          echo "CONFIG_IOSCHED_KYBER=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_KSM=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_UCLAMP_TASK=y" >> common/arch/arm64/configs/gki_defconfig          
+          echo "CONFIG_IOSCHED_KYBER=y" >> common/arch/arm64/configs/gki_defconfig           
           
           # ── Additional Netfilter Options ──
           echo "CONFIG_WIREGUARD=y" >> common/arch/arm64/configs/gki_defconfig
