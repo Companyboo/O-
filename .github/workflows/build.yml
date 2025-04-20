@@ -203,27 +203,25 @@ jobs:
           # ── Netfilter: TTL targets/matches ──
           echo "CONFIG_IP_NF_TARGET_TTL=y" >> common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_IP6_NF_TARGET_HL=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_IP6_NF_MATCH_HL=y" >> common/arch/arm64/configs/gki_defconfig           
-
-          # ── Scheduler & CPU governor tweaks ──
-          echo "CONFIG_SCHED_CLASS_EXT=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_SMP=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_CPU_FREQ_GOV_SCHEDUTIL=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_MSM_PERFORMANCE=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_FAIR_GROUP_SCHED=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_CFS_BANDWIDTH=y" >> common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_IP6_NF_MATCH_HL=y" >> common/arch/arm64/configs/gki_defconfig
+          
+          # ── Additional Netfilter Options ──
+          echo "CONFIG_WIREGUARD=y" >> common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_IP_NF_NAT=y" >> common/arch/arm64/configs/gki_defconfig            
 
           # ── Power & idle optimizations ──
           echo "CONFIG_NO_HZ_IDLE=y" >> common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_PM_SLEEP_SMP=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_CPU_IDLE=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_ENERGY_MODEL=y" >> common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_CPU_IDLE=y" >> common/arch/arm64/configs/gki_defconfig          
           echo "CONFIG_PM_AUTOSLEEP=y" >> common/arch/arm64/configs/gki_defconfig
 
           # ── Strip debug to reduce size ──
           echo "CONFIG_DEBUG_KERNEL=n" >> common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_DYNAMIC_DEBUG=n" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_DEBUG_INFO=n" >> common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_DEBUG_INFO=n" >> common/arch/arm64/configs/gki_defconfig         
+          echo "CONFIG_DEBUG_KERNEL=n" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_DYNAMIC_DEBUG=n" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_DEBUG_INFO=n" >> ./common/arch/arm64/configs/gki_defconfig
 
       - name: Run sed and perl Commands
         run: |
