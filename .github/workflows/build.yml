@@ -203,10 +203,7 @@ jobs:
           # ── Netfilter: TTL targets/matches ──
           echo "CONFIG_IP_NF_TARGET_TTL=y" >> common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_IP6_NF_TARGET_HL=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_IP6_NF_MATCH_HL=y" >> common/arch/arm64/configs/gki_defconfig
-
-          # ── Additional Netfilter Options ──
-          echo "CONFIG_WIREGUARD=y" >> common/arch/arm64/configs/gki_defconfig          
+          echo "CONFIG_IP6_NF_MATCH_HL=y" >> common/arch/arm64/configs/gki_defconfig           
 
           # ── Scheduler & CPU governor tweaks ──
           echo "CONFIG_SCHED_CLASS_EXT=y" >> common/arch/arm64/configs/gki_defconfig
