@@ -24,9 +24,9 @@ jobs:
 
       - name: Check for new commit in OEM repo
         id: check
-        run: |          
-	  LATEST_COMMIT=$(curl -s https://api.github.com/repos/OnePlusOSS/kernel_manifest/commits?sha=oneplus/sm8650 | jq -r '.[0].sha')  
-          echo "Latest OEM Commit: $LATEST_COMMIT"
+         run: |
+          LATEST_COMMIT=$(curl -s https://api.github.com/repos/OnePlusOSS/android_kernel_common_oneplus_sm8750/commits?sha=oneplus/sm8650_v_15.0.0_oneplus_13r | jq -r '.[0].sha')
+          echo "Latest Kernel Commit: $LATEST_COMMIT"
 
           CACHE_PATH=".last_oem_commit"
           if [ -f "$CACHE_PATH" ]; then
