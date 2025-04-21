@@ -223,7 +223,16 @@ jobs:
            echo "CONFIG_QCOM_APM=y" >> common/arch/arm64/configs/gki_defconfig          
            echo "CONFIG_QCOM_DFC=y" >> common/arch/arm64/configs/gki_defconfig
            echo "CONFIG_CPU_IDLE_GOV_MENU=y" >> common/arch/arm64/configs/gki_defconfig
- 
+
+          # ── bbrv3 config setting ──
+      
+           echo "CONFIG_TCP_CONG_ADVANCED=y" >> ./common/arch/arm64/configs/gki_defconfig 
+           echo "CONFIG_TCP_CONG_BBR=y" >> ./common/arch/arm64/configs/gki_defconfig
+           echo "CONFIG_NET_SCH_FQ=y" >> ./common/arch/arm64/configs/gki_defconfig
+           echo "CONFIG_TCP_CONG_BIC=n" >> ./common/arch/arm64/configs/gki_defconfig
+           echo "CONFIG_TCP_CONG_WESTWOOD=n" >> ./common/arch/arm64/configs/gki_defconfig
+           echo "CONFIG_TCP_CONG_HTCP=n" >> ./common/arch/arm64/configs/gki_defconfig 
+
            # ── Strip debug to reduce size ──
            echo "CONFIG_DEBUG_KERNEL=n" >> common/arch/arm64/configs/gki_defconfig
            echo "CONFIG_DYNAMIC_DEBUG=n" >> common/arch/arm64/configs/gki_defconfig
