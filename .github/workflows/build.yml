@@ -264,7 +264,8 @@ jobs:
 
           sed -i 's/CONFIG_LTO=n/CONFIG_LTO=y/' "./common/arch/arm64/configs/gki_defconfig"
           sed -i 's/CONFIG_LTO_CLANG_FULL=y/CONFIG_LTO_CLANG_THIN=y/' "./common/arch/arm64/configs/gki_defconfig"
-          sed -i 's/CONFIG_LTO_CLANG_NONE=y/CONFIG_LTO_CLANG_THIN=y/' "./common/arch/arm64/configs/gki_defconfig"         
+          sed -i 's/CONFIG_LTO_CLANG_NONE=y/CONFIG_LTO_CLANG_THIN=y/' "./common/arch/arm64/configs/gki_defconfig"
+          sed -i 's/\.name[[:space:]]*=[[:space:]]*"bbr",/\.name = "bbr3",/' ./common/net/ipv4/tcp_bbr.c
           
           # Run sed commands for modifications
           sed -i 's/check_defconfig//' ./common/build.config.gki
