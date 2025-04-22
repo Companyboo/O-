@@ -176,68 +176,56 @@ jobs:
           echo "Adding configuration settings to gki_defconfig..."
 
            # ── Add KernelSU (KSU) support ──
-          echo "CONFIG_KSU=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_KSU_WITH_KPROBES=n" >> common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_WITH_KPROBES=n" >> ./common/arch/arm64/configs/gki_defconfig
 
           # ── Enable SUSFS (Secure SU Filesystem) add‑on ──
-          echo "CONFIG_KSU_SUSFS=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_KSTAT=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_KSU_SUSFS_SPOOF_UNAME=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_KSU_SUSFS_ENABLE_LOG=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_KSU_SUSFS_TRY_UMOUNT=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_OVERLAYFS=n" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS_SUS_KSTAT=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS_SPOOF_UNAME=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS_ENABLE_LOG=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS_TRY_UMOUNT=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS_SUS_OVERLAYFS=n" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> ./common/arch/arm64/configs/gki_defconfig
 
           # ── Enhance tmpfs for rootshell tools ──
-          echo "CONFIG_TMPFS_XATTR=y" >> common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_TMPFS_POSIX_ACL=y" >> common/arch/arm64/configs/gki_defconfig
-
-           # ── I/O Schedulers ──          
-           echo "CONFIG_IOSCHED_BFQ=y" >> common/arch/arm64/configs/gki_defconfig         
-           echo "CONFIG_IOSCHED_KYBER=y" >> common/arch/arm64/configs/gki_defconfig           
-           echo "CONFIG_QCOM_CPUFREQ_HW=y" >> common/arch/arm64/configs/gki_defconfig
-           
-           # ── Additional Netfilter Options ──
-           echo "CONFIG_WIREGUARD=y" >> common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_IP_NF_NAT=y" >> common/arch/arm64/configs/gki_defconfig            
-           echo "CONFIG_IP_NF_NAT=y" >> common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_UNMAP_KERNEL_AT_EL0=y" >> common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_TMPFS_XATTR=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_TMPFS_POSIX_ACL=y" >> ./common/arch/arm64/configs/gki_defconfig
+                  
+          # ── Additional Netfilter Options ──
+          echo "CONFIG_WIREGUARD=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_IP_NF_NAT=y" >> ./common/arch/arm64/configs/gki_defconfig            
+          echo "CONFIG_IP_NF_TARGET_TTL=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_IP6_NF_TARGET_HL=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_IP6_NF_MATCH_HL=y" >> ./common/arch/arm64/configs/gki_defconfig          
  
-           # ── Power & idle optimizations ──
-           echo "CONFIG_NO_HZ_IDLE=y" >> common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_PM_SLEEP_SMP=y" >> common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_CPU_IDLE=y" >> common/arch/arm64/configs/gki_defconfig          
-           echo "CONFIG_PM_AUTOSLEEP=y" >> common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_DEVFREQ_GOV_SIMPLE_ONDEMAND=y" >> common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_DEVFREQ_GOV_PERFORMANCE=y" >> common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_DEVFREQ_GOV_POWERSAVE=y" >> common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_DEVFREQ_GOV_USERSPACE=y" >> common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_QCOM_APM=y" >> common/arch/arm64/configs/gki_defconfig          
-           echo "CONFIG_QCOM_DFC=y" >> common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_CPU_IDLE_GOV_MENU=y" >> common/arch/arm64/configs/gki_defconfig
+          # ── Power & idle optimizations ──
+          echo "CONFIG_NO_HZ_IDLE=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_PM_SLEEP_SMP=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_CPU_IDLE=y" >> ./common/arch/arm64/configs/gki_defconfig     
+          echo "CONFIG_PM_AUTOSLEEP=y" >> ./common/arch/arm64/configs/gki_defconfig        
 
-          # ── bbrv3 config setting ──
-      
-           echo "CONFIG_TCP_CONG_ADVANCED=y" >> ./common/arch/arm64/configs/gki_defconfig 
-           echo "CONFIG_TCP_CONG_BBR=y" >> ./common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_NET_SCH_FQ=y" >> ./common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_TCP_CONG_BIC=n" >> ./common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_TCP_CONG_WESTWOOD=n" >> ./common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_TCP_CONG_HTCP=n" >> ./common/arch/arm64/configs/gki_defconfig 
+          # ── bbr config setting ──      
+          echo "CONFIG_TCP_CONG_ADVANCED=y" >> ./common/arch/arm64/configs/gki_defconfig 
+          echo "CONFIG_TCP_CONG_BBR=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_NET_SCH_FQ=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_TCP_CONG_BIC=n" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_TCP_CONG_WESTWOOD=n" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_TCP_CONG_HTCP=n" >> ./common/arch/arm64/configs/gki_defconfig 
 
            # ── Strip debug to reduce size ──
-           echo "CONFIG_DEBUG_KERNEL=n" >> common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_DYNAMIC_DEBUG=n" >> common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_DEBUG_INFO=n" >> common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_KALLSYMS=n" >> common/arch/arm64/configs/gki_defconfig
+           echo "CONFIG_DEBUG_KERNEL=n" >> ./common/arch/arm64/configs/gki_defconfig
+           echo "CONFIG_DYNAMIC_DEBUG=n" >> ./common/arch/arm64/configs/gki_defconfig
+           echo "CONFIG_DEBUG_INFO=n" >> ./common/arch/arm64/configs/gki_defconfig
+           echo "CONFIG_KALLSYMS=n" >> ./common/arch/arm64/configs/gki_defconfig
          
       - name: Run sed and perl Commands
         run: |
