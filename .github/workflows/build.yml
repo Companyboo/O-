@@ -264,24 +264,7 @@ jobs:
 
           sed -i 's/CONFIG_LTO=n/CONFIG_LTO=y/' "./common/arch/arm64/configs/gki_defconfig"
           sed -i 's/CONFIG_LTO_CLANG_FULL=y/CONFIG_LTO_CLANG_THIN=y/' "./common/arch/arm64/configs/gki_defconfig"
-          sed -i 's/CONFIG_LTO_CLANG_NONE=y/CONFIG_LTO_CLANG_THIN=y/' "./common/arch/arm64/configs/gki_defconfig"
-
-          # Run sed bbrv3
-          static struct tcp_congestion_ops tcp_bbr_cong_ops __read_mostly = {
-           .flags  = TCP_CONG_NON_RESTRICTED | TCP_CONG_WANTS_CE_EVENTS,
-           .name  = "bbr3",
-           .owner  = THIS_MODULE,
-           .init  = bbr_init,
-           .cong_control = bbr_main,
-           .sndbuf_expand = bbr_sndbuf_expand,
-           .skb_marked_lost = bbr_skb_marked_lost,
-           .undo_cwnd = bbr_undo_cwnd,
-           .cwnd_event = bbr_cwnd_event,
-           .ssthresh = bbr_ssthresh,
-           .tso_segs = bbr_tso_segs,
-           .get_info = bbr_get_info,
-           .set_state = bbr_set_state,
-          };     
+          sed -i 's/CONFIG_LTO_CLANG_NONE=y/CONFIG_LTO_CLANG_THIN=y/' "./common/arch/arm64/configs/gki_defconfig"         
           
           # Run sed commands for modifications
           sed -i 's/check_defconfig//' ./common/build.config.gki
