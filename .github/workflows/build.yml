@@ -98,6 +98,7 @@ jobs:
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/kernel_patches.git
+          git clone https://github.com/google/bbr.git -b v3
 
       - name: Initialize and Sync Kernel Source
         run: |
@@ -111,7 +112,7 @@ jobs:
           
           # Sync repo and apply patches
           $REPO --version
-          $REPO --trace sync -c --no-clone-bundle --no-tags --optimized-fetch -j$(nproc --all) --fail-fast
+          $REPO --trace sync -c --no-clone-bundle --no-tags --optimized-fetch -j$(nproc --all) --fail-fast      
       
       - name: Add KernelSU
         run: |
@@ -213,19 +214,32 @@ jobs:
           echo "CONFIG_CPU_IDLE=y" >> ./common/arch/arm64/configs/gki_defconfig     
           echo "CONFIG_PM_AUTOSLEEP=y" >> ./common/arch/arm64/configs/gki_defconfig        
 
-          # ── bbr config setting ──      
-          echo "CONFIG_TCP_CONG_ADVANCED=y" >> ./common/arch/arm64/configs/gki_defconfig 
-          echo "CONFIG_TCP_CONG_BBR=y" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_NET_SCH_FQ=y" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_TCP_CONG_BIC=n" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_TCP_CONG_WESTWOOD=n" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_TCP_CONG_HTCP=n" >> ./common/arch/arm64/configs/gki_defconfig 
-
-           # ── Strip debug to reduce size ──
+          # ── Strip debug to reduce size ──
            echo "CONFIG_DEBUG_KERNEL=n" >> ./common/arch/arm64/configs/gki_defconfig
            echo "CONFIG_DYNAMIC_DEBUG=n" >> ./common/arch/arm64/configs/gki_defconfig
            echo "CONFIG_DEBUG_INFO=n" >> ./common/arch/arm64/configs/gki_defconfig
            echo "CONFIG_KALLSYMS=n" >> ./common/arch/arm64/configs/gki_defconfig
+
+      - name: Merge BBR v3 into Kernel Source
+        run: |
+          cd "$CONFIG/kernel_platform"
+          git config --global user.email "q543069760@gmail.com"
+          git config --global user.name "Build"
+          git remote add google-bbr https://github.com/google/bbr.git
+          git fetch google-bbr v3
+          git show-ref --verify --quiet refs/remotes/google-bbr/v3 || { echo "Error: google-bbr/v3 branch not found"; exit 1; }
+          git merge google-bbr/v3 --allow-unrelated-histories -m "Merge BBR v3 into kernel"
+
+      - name: Add BBR Configuration Settings
+        run: |
+          cd "$CONFIG/kernel_platform"
+          echo "CONFIG_TCP_CONG_BBR=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_DEFAULT_TCP_CONG=\"bbr\"" >> ./common/arch/arm64/configs/gki_defconfig
+
+      - name: Validate gki_defconfig for BBR and KernelSU Configurations
+        run: |
+          echo "Validating gki_defconfig for required configurations..."
+          CONFIG_FILE="$CONFIG/kernel_platform/common/arch/arm64/configs/gki_defconfig"
          
       - name: Run sed and perl Commands
         run: |
