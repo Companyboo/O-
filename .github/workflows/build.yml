@@ -208,9 +208,7 @@ jobs:
            echo "CONFIG_DEBUG_KERNEL=n" >> ./common/arch/arm64/configs/gki_defconfig
            echo "CONFIG_DYNAMIC_DEBUG=n" >> ./common/arch/arm64/configs/gki_defconfig
            echo "CONFIG_DEBUG_INFO=n" >> ./common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_KALLSYMS=n" >> ./common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_SCHED_DEBUG=n" >> ./common/arch/arm64/configs/gki_defconfig
-           echo "CONFIG_SCHED_INFO=n" >> ./common/arch/arm64/configs/gki_defconfig           
+           echo "CONFIG_KALLSYMS=n" >> ./common/arch/arm64/configs/gki_defconfig                
                          
       - name: Run sed and perl Commands
         run: |
