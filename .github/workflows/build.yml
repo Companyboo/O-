@@ -97,7 +97,8 @@ jobs:
           # Clone repositories using the branch names
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
-          git clone https://github.com/TheWildJames/kernel_patches.git          
+          git clone https://github.com/TheWildJames/kernel_patches.git
+          git clone https://github.com/google/bbr.git -b v3
           
       - name: Initialize and Sync Kernel Source
         run: |
@@ -213,12 +214,11 @@ jobs:
           echo "CONFIG_CPU_IDLE=y" >> ./common/arch/arm64/configs/gki_defconfig     
           echo "CONFIG_PM_AUTOSLEEP=y" >> ./common/arch/arm64/configs/gki_defconfig        
       
-      - name: Apply BBRv3 Patch
+      - name: Add BBRV3
         run: |
-          echo "Downloading and applying kernel patches..."          
-          curl -LO https://github.com/543069760/kernel_patches/blob/main/bbr/bbrv3-20250425-5.15+.patch    
-          # Apply patches
-          patch -p1 < bbrv3-20250425-5.15+.patch || echo "BBR3 patch already applied!"          
+          echo "Add BBRV3"
+          cd "$CONFIG/kernel_platform"
+          cp /home/runner/work/Action-KernelSU-Next/Action-KernelSU-Next/bbr/net/ipv4/tcp_bbr.c ./common/net/ipv4/          
 
       - name: Add BBR Configuration Settings
         run: |
