@@ -215,15 +215,10 @@ jobs:
       
       - name: Apply BBRv3 Patch
         run: |
-          echo "Downloading and applying kernel patches..."
-          curl -LO https://raw.githubusercontent.com/CachyOS/kernel-patches/refs/heads/master/6.6/0001-bbr3.patch
-          curl -LO https://raw.githubusercontent.com/ajdgsu/Action-Build/refs/heads/main/010-0099-fasterbbr-tsunami.patch
-          curl -LO https://raw.githubusercontent.com/CachyOS/kernel-patches/refs/heads/master/6.6/sched/0001-bore.patch          
-          
+          echo "Downloading and applying kernel patches..."          
+          curl -LO https://github.com/543069760/kernel_patches/blob/main/bbr/bbrv3-20250425-5.15+.patch    
           # Apply patches
-          patch -p1 < 0001-bbr3.patch || echo "BBR3 patch already applied!"
-          patch -p1 < 010-0099-fasterbbr-tsunami.patch || echo "Tsunami patch already applied!"
-          patch -p1 < 0001-bore.patch || echo "Bore patch already applied!"
+          patch -p1 < bbrv3-20250425-5.15+.patch || echo "BBR3 patch already applied!"          
 
       - name: Add BBR Configuration Settings
         run: |
