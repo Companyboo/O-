@@ -213,11 +213,9 @@ jobs:
           echo "CONFIG_CPU_IDLE=y" >> ./common/arch/arm64/configs/gki_defconfig     
           echo "CONFIG_PM_AUTOSLEEP=y" >> ./common/arch/arm64/configs/gki_defconfig        
             
-      - name: Add Linux Mainline and Google BBR Remotes
+      - name: Add Google BBR Remotes
         run: |
-          git remote | grep -q "^mainline$" || git remote add mainline https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
           git remote | grep -q "^google-bbr$" || git remote add google-bbr https://github.com/google/bbr.git
-          git fetch mainline
           git fetch google-bbr v3
 
       - name: Cherry-Pick BBRv3 Commits
