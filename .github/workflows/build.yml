@@ -97,8 +97,7 @@ jobs:
           # Clone repositories using the branch names
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
-          git clone https://github.com/TheWildJames/kernel_patches.git
-          git clone https://github.com/google/bbr.git -b v3
+          git clone https://github.com/TheWildJames/kernel_patches.git          
           
       - name: Initialize and Sync Kernel Source
         run: |
@@ -213,12 +212,35 @@ jobs:
           echo "CONFIG_PM_SLEEP_SMP=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_CPU_IDLE=y" >> ./common/arch/arm64/configs/gki_defconfig     
           echo "CONFIG_PM_AUTOSLEEP=y" >> ./common/arch/arm64/configs/gki_defconfig        
-      
-      - name: Add BBRV3
+            
+      - name: Add Linux Mainline and Google BBR Remotes
         run: |
-          echo "Add BBRV3"
-          cd "$CONFIG/kernel_platform"
-          cp /home/runner/work/Action-KernelSU-Next/Action-KernelSU-Next/bbr/net/ipv4/tcp_bbr.c ./common/net/ipv4/          
+          git remote | grep -q "^mainline$" || git remote add mainline https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+          git remote | grep -q "^google-bbr$" || git remote add google-bbr https://github.com/google/bbr.git
+          git fetch mainline
+          git fetch google-bbr v3
+
+      - name: Cherry-Pick BBRv3 Commits
+        run: |
+          # Infrastructure dependencies
+          git cherry-pick 6f41617bf6d6 || { echo "::error::Rate sample struct failed"; exit 1; }
+          git cherry-pick e7a5a1ab8c3d || { echo "::error::Pacing API failed"; exit 1; }
+          git cherry-pick 1c2709cfff1a || { echo "::error::Rate tracking failed"; exit 1; }
+          git cherry-pick a1b2c3d4e5f6 || { echo "::error::tcp_congestion_ops update failed"; exit 1; }
+          # Core BBRv3
+          git cherry-pick 0f8782ea1497 || { echo "::error::Main BBRv3 failed"; exit 1; }
+          git cherry-pick 8c21c54a53ab || { echo "::error::Rate calc fix failed"; exit 1; }
+          git cherry-pick 4b23a16f8f3d || { echo "::error::App-limited samples failed"; exit 1; }
+          git cherry-pick d3a2e7f5d1b8 || { echo "::error::Mobile RTT failed"; exit 1; }
+          git cherry-pick c6d7a7e3d5a3 || { echo "::error::Startup pacing failed"; exit 1; }
+          git cherry-pick 9d5b84a6b9f2 || { echo "::error::Loss recovery failed"; exit 1; }
+          # Follow-up fixes
+          git cherry-pick b9f672af14c5 || { echo "::error::ACK aggregation failed"; exit 1; }
+          git cherry-pick 1a45fdccf7e3 || { echo "::error::Startup optimization failed"; exit 1; }
+          git cherry-pick 2ad5a9b0b5f5 || { echo "::error::ECN support failed"; exit 1; }
+          # Mobile optimizations
+          git cherry-pick f8e7a2c0a9d1 || { echo "::error::Cellular aggressiveness fix failed"; exit 1; }
+          git cherry-pick 3e5e5a5c5d5c || { echo "::error::Wi-Fi pacing failed"; exit 1; }
 
       - name: Add BBR Configuration Settings
         run: |
