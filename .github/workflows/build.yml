@@ -220,6 +220,10 @@ jobs:
 
       - name: Cherry-Pick BBRv3 Commits
         run: |
+          cd "$CONFIG/kernel_platform"
+          git remote add google-bbr https://github.com/google/bbr.git
+          git fetch google-bbr v3
+          git show-ref --verify --quiet refs/remotes/google-bbr/v3 || { echo "Error: google-bbr/v3 branch not found"; exit 1; }
           # Infrastructure dependencies
           git cherry-pick 6f41617bf6d6 || { echo "::error::Rate sample struct failed"; exit 1; }
           git cherry-pick e7a5a1ab8c3d || { echo "::error::Pacing API failed"; exit 1; }
