@@ -79,10 +79,10 @@ jobs:
         include:
           - model: gt5pro
             soc: sun
-            branch: realme/sm8750
+            branch: realme/sm8650
             manifest: realme_gt5pro_v.xml
-            android_version: android15
-            kernel_version: "6.6"
+            android_version: android14
+            kernel_version: "6.1"
           - model: gt7pro
             soc: sun
             branch: realme/sm8750
