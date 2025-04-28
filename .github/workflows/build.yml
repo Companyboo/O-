@@ -107,7 +107,7 @@ jobs:
           
           # Initialize and sync kernel source
           echo "Initializing and syncing kernel source..."
-          $REPO init -u repo init -u manifest: $REPO init -u repo init -u manifest: https://github.com/skrbcy/kernel_manifest.git -m realme_gt7pro_v.xml --repo-rev=v2.16 --depth=1 --no-clone-bundle --no-tags
+          $REPO init -uhttps://github.com/skrbcy/kernel_manifest.git -b ${{ inputs.branch }} -m ${{ inputs.manifest }} --repo-rev=v2.16 --depth=1 --no-clone-bundle --no-tags
            
           # Sync repo and apply patches
           $REPO --version
