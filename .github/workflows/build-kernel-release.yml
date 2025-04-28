@@ -79,13 +79,13 @@ jobs:
         include:
           - model: gt5pro
             soc: sun
-            branch: oneplus/sm8750
+            branch: realme/sm8750
             manifest: realme_gt5pro_v.xml
             android_version: android15
             kernel_version: "6.6"
           - model: gt7pro
             soc: sun
-            branch: oneplus/sm8750
+            branch: realme/sm8750
             manifest: realme_gt7pro_v.xml
             android_version: android15
             kernel_version: "6.6"
