@@ -212,11 +212,6 @@ jobs:
           echo "CONFIG_PM_SLEEP_SMP=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_CPU_IDLE=y" >> ./common/arch/arm64/configs/gki_defconfig     
           echo "CONFIG_PM_AUTOSLEEP=y" >> ./common/arch/arm64/configs/gki_defconfig        
-            
-      - name: Add Google BBR Remotes
-        run: |
-          git remote | grep -q "^google-bbr$" || git remote add google-bbr https://github.com/google/bbr.git
-          git fetch google-bbr v3
 
       - name: Cherry-Pick BBRv3 Commits
         run: |
