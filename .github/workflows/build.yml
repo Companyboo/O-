@@ -138,7 +138,7 @@ jobs:
           echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
           sed -i "s/DKSU_VERSION=11998/DKSU_VERSION=${KSU_VERSION}/" Makefile
 
-     - name: Apply SUSFS Patches
+      - name: Apply SUSFS Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG/kernel_platform"
@@ -153,10 +153,8 @@ jobs:
           cd ./KernelSU-Next
           
           echo "Applying next SUSFS patches..."
-          #cp ../../../kernel_patches/next/0001-kernel-patch-susfs-v1.5.5-to-KernelSU-Next-v1.0.5.patch ./
-          #patch -p1 --forward < 0001-kernel-patch-susfs-v1.5.5-to-KernelSU-Next-v1.0.5.patch || true
-          curl -O https://raw.githubusercontent.com/Bouteillepleine/kernel_patches/main/next/kernel-implement-susfs-v1.5.7-gki.patch
-          patch -p1 --forward < kernel-implement-susfs-v1.5.7-gki.patch || true
+          cp ../../../kernel_patches/next/kernel-patch-susfs-v1.5.7-to-KernelSU-Next.patch ./
+          patch -p1 --forward < kernel-patch-susfs-v1.5.7-to-KernelSU-Next.patch || true
           
           # Change to common directory and apply SUSFS patch
           cd ../common
@@ -164,7 +162,7 @@ jobs:
             sed -i '/#include <trace\/hooks\/blk.h>/a #include <trace/hooks/fs.h>' ./fs/namespace.c
           fi
           patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
-
+          
       - name: Apply KSU Hooks
         run: |
           echo "Changing to configuration directory: $CONFIG..."
@@ -218,43 +216,48 @@ jobs:
           echo "CONFIG_IP_NF_NAT=y" >> ./common/arch/arm64/configs/gki_defconfig            
           echo "CONFIG_IP_NF_TARGET_TTL=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_IP6_NF_TARGET_HL=y" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_IP6_NF_MATCH_HL=y" >> ./common/arch/arm64/configs/gki_defconfig          
- 
-          # ── Power & idle optimizations ──
-          echo "CONFIG_NO_HZ_IDLE=y" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_PM_SLEEP_SMP=y" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_CPU_IDLE=y" >> ./common/arch/arm64/configs/gki_defconfig     
-          echo "CONFIG_PM_AUTOSLEEP=y" >> ./common/arch/arm64/configs/gki_defconfig    
-    
-      - name: Add BBR Configuration Settings
-        run: |
-          cd "$CONFIG/kernel_platform"
+          echo "CONFIG_IP6_NF_MATCH_HL=y" >> ./common/arch/arm64/configs/gki_defconfig
+
+           # ── Strip debug to reduce size ──
+          echo "CONFIG_DEBUG_KERNEL=n" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_DYNAMIC_DEBUG=n" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_DEBUG_INFO=n" >> ./common/arch/arm64/configs/gki_defconfig         
+          
+          # Add bbr and fq config setting
           echo "CONFIG_TCP_CONG_ADVANCED=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_TCP_CONG_BBR=y" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_DEFAULT_TCP_CONG=\"bbr\"" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_TCP_CONG_CDG=y" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_DEFAULT_BBR=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_DEFAULT_CUBIC=n" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_DEFAULT_CDG=n" >> ./common/arch/arm64/configs/gki_defconfig          
+          echo "CONFIG_DEFAULT_BBR=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo 'CONFIG_DEFAULT_TCP_CONG="bbr3"' >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_NET_SCH_DEFAULT=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_DEFAULT_FQ=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo 'CONFIG_DEFAULT_NET_SCH="fq"' >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_NET_SCH_HTB=n" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_NET_SCH_PRIO=n" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_NET_SCH_SFQ=n" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_NET_SCH_TBF=n" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_TCP_CONG_BIC=n" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_TCP_CONG_WESTWOOD=n" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_TCP_CONG_HTCP=n" >> ./common/arch/arm64/configs/gki_defconfig  
+          echo "CONFIG_TCP_CONG_HTCP=n" >> ./common/arch/arm64/configs/gki_defconfig
+          
           # Add rcu config setting
           echo "CONFIG_RCU_TRACE=n" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_RCU_LAZY_DEFAULT_OFF=n" >> ./common/arch/arm64/configs/gki_defconfig         
+          echo "CONFIG_RCU_LAZY_DEFAULT_OFF=n" >> ./common/arch/arm64/configs/gki_defconfig
+          
+          # Add personal config setting
           echo "CONFIG_IP_NF_TARGET_ECN=y" >> ./common/arch/arm64/configs/gki_defconfig
-          # Disable mq and force bbr3
-          sed -i 's/qdisc_create_dflt(txq, \&mq_qdisc_ops, TC_H_ROOT, NULL);/qdisc_create_dflt(txq, \&fq_qdisc_ops, TC_H_ROOT, NULL);/' ./common/net/sched/sch_generic.c
-          sed -i '/^[[:space:]]*default "bbr" if DEFAULT_BBR$/s/"bbr"/"bbr3"/' ./common/net/ipv4/Kconfig          
 
-      - name: Force ECN + Reduce overhead       
+          # Disable mq and force bbr3
+          sed -i 's/static struct Qdisc_ops fq_qdisc_ops/struct Qdisc_ops fq_qdisc_ops/' ./common/net/sched/sch_fq.c
+          awk '
+              /struct Qdisc_ops fq_qdisc_ops __read_mostly = {/ {found=1} 
+              found && /^};$/ {print $0; print "EXPORT_SYMBOL(fq_qdisc_ops);"; found=0; next}
+              {print}
+          ' ./common/net/sched/sch_fq.c > tmp && mv tmp ./common/net/sched/sch_fq.c
+          sed -i '/#include <linux\/netdevice.h>/a extern struct Qdisc_ops fq_qdisc_ops;' ./common/net/sched/sch_generic.c
+          sed -i 's/qdisc_create_dflt(txq, \&mq_qdisc_ops, TC_H_ROOT, NULL);/qdisc_create_dflt(txq, \&fq_qdisc_ops, TC_H_ROOT, NULL);/' ./common/net/sched/sch_generic.c
+          sed -i '/^[[:space:]]*default "bbr" if DEFAULT_BBR$/s/"bbr"/"bbr3"/' ./common/net/ipv4/Kconfig
+          fi
+
+      - name: Force ECN + Reduce overhead
+        #if: ${{ inputs.kernel_version == '6.6' }}
         run: |
           cd "$CONFIG/kernel_platform/common/net/ipv4"
           sed -i 's/net->ipv4.sysctl_tcp_ecn = 2;/net->ipv4.sysctl_tcp_ecn = 1;/' tcp_ipv4.c
@@ -264,8 +267,8 @@ jobs:
           sed -i 's/net->ipv4.sysctl_tcp_pacing_ss_ratio = 200;/net->ipv4.sysctl_tcp_pacing_ss_ratio = 160;/' tcp_ipv4.c
           sed -i 's/net->ipv4.sysctl_tcp_pacing_ca_ratio = 120;/net->ipv4.sysctl_tcp_pacing_ca_ratio = 110;/' tcp_ipv4.c
           grep "sysctl_tcp_pacing" tcp_ipv4.c
-          ls -t | grep -E 'tcp_|sysctl_'
-
+          ls -t | grep -E 'tcp_|sysctl_'       
+      
       - name: Validate gki_defconfig for BBR and KernelSU Configurations
         run: |
           echo "Validating gki_defconfig for required configurations..."
