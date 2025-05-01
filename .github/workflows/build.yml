@@ -111,7 +111,18 @@ jobs:
           
           # Sync repo and apply patches
           $REPO --version
-          $REPO --trace sync -c --no-clone-bundle --no-tags --optimized-fetch -j$(nproc --all) --fail-fast      
+          $REPO --trace sync -c --no-clone-bundle --no-tags --optimized-fetch -j$(nproc --all) --fail-fast
+
+      - name: Merge BBR v3 into Kernel Source       
+        run: |
+          cd "$CONFIG/kernel_platform"
+          git config --global user.email "q543069760@gmail.com"
+          git config --global user.name "Build"
+          git remote add google-bbr https://github.com/google/bbr.git
+          git fetch google-bbr v3
+          git show-ref --verify --quiet refs/remotes/google-bbr/v3 || { echo "Error: google-bbr/v3 branch not found"; exit 1; }
+          git merge google-bbr/v3 --allow-unrelated-histories -m "Merge BBR v3 into kernel"
+          sed -i 's/^\([[:space:]]*\)\.name[[:space:]]*=[[:space:]]*"bbr",/\1.name = "bbr3",/' ./common/net/ipv4/tcp_bbr.c
       
       - name: Add KernelSU
         run: |
@@ -211,34 +222,8 @@ jobs:
           echo "CONFIG_NO_HZ_IDLE=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_PM_SLEEP_SMP=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_CPU_IDLE=y" >> ./common/arch/arm64/configs/gki_defconfig     
-          echo "CONFIG_PM_AUTOSLEEP=y" >> ./common/arch/arm64/configs/gki_defconfig        
-
-      - name: Cherry-Pick BBRv3 Commits
-        run: |
-          cd "$CONFIG/kernel_platform"
-          git remote add google-bbr https://github.com/google/bbr.git
-          git fetch google-bbr v3
-          git show-ref --verify --quiet refs/remotes/google-bbr/v3 || { echo "Error: google-bbr/v3 branch not found"; exit 1; }
-          # Infrastructure dependencies
-          git cherry-pick 6f41617bf6d6 || { echo "::error::Rate sample struct failed"; exit 1; }
-          git cherry-pick e7a5a1ab8c3d || { echo "::error::Pacing API failed"; exit 1; }
-          git cherry-pick 1c2709cfff1a || { echo "::error::Rate tracking failed"; exit 1; }
-          git cherry-pick a1b2c3d4e5f6 || { echo "::error::tcp_congestion_ops update failed"; exit 1; }
-          # Core BBRv3
-          git cherry-pick 0f8782ea1497 || { echo "::error::Main BBRv3 failed"; exit 1; }
-          git cherry-pick 8c21c54a53ab || { echo "::error::Rate calc fix failed"; exit 1; }
-          git cherry-pick 4b23a16f8f3d || { echo "::error::App-limited samples failed"; exit 1; }
-          git cherry-pick d3a2e7f5d1b8 || { echo "::error::Mobile RTT failed"; exit 1; }
-          git cherry-pick c6d7a7e3d5a3 || { echo "::error::Startup pacing failed"; exit 1; }
-          git cherry-pick 9d5b84a6b9f2 || { echo "::error::Loss recovery failed"; exit 1; }
-          # Follow-up fixes
-          git cherry-pick b9f672af14c5 || { echo "::error::ACK aggregation failed"; exit 1; }
-          git cherry-pick 1a45fdccf7e3 || { echo "::error::Startup optimization failed"; exit 1; }
-          git cherry-pick 2ad5a9b0b5f5 || { echo "::error::ECN support failed"; exit 1; }
-          # Mobile optimizations
-          git cherry-pick f8e7a2c0a9d1 || { echo "::error::Cellular aggressiveness fix failed"; exit 1; }
-          git cherry-pick 3e5e5a5c5d5c || { echo "::error::Wi-Fi pacing failed"; exit 1; }
-
+          echo "CONFIG_PM_AUTOSLEEP=y" >> ./common/arch/arm64/configs/gki_defconfig    
+    
       - name: Add BBR Configuration Settings
         run: |
           cd "$CONFIG/kernel_platform"
@@ -258,7 +243,27 @@ jobs:
           echo "CONFIG_NET_SCH_TBF=n" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_TCP_CONG_BIC=n" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_TCP_CONG_WESTWOOD=n" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_TCP_CONG_HTCP=n" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_TCP_CONG_HTCP=n" >> ./common/arch/arm64/configs/gki_defconfig  
+          # Add rcu config setting
+          echo "CONFIG_RCU_TRACE=n" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_RCU_LAZY_DEFAULT_OFF=n" >> ./common/arch/arm64/configs/gki_defconfig         
+          echo "CONFIG_IP_NF_TARGET_ECN=y" >> ./common/arch/arm64/configs/gki_defconfig
+          # Disable mq and force bbr3
+          sed -i 's/qdisc_create_dflt(txq, \&mq_qdisc_ops, TC_H_ROOT, NULL);/qdisc_create_dflt(txq, \&fq_qdisc_ops, TC_H_ROOT, NULL);/' ./common/net/sched/sch_generic.c
+          sed -i '/^[[:space:]]*default "bbr" if DEFAULT_BBR$/s/"bbr"/"bbr3"/' ./common/net/ipv4/Kconfig          
+
+      - name: Force ECN + Reduce overhead
+        #if: ${{ inputs.kernel_version == '6.6' }}
+        run: |
+          cd "$CONFIG/kernel_platform/common/net/ipv4"
+          sed -i 's/net->ipv4.sysctl_tcp_ecn = 2;/net->ipv4.sysctl_tcp_ecn = 1;/' tcp_ipv4.c
+          grep "sysctl_tcp_ecn" tcp_ipv4.c
+          sed -i '/\.procname[[:space:]]*=[[:space:]]*"tcp_ecn"/, /^[[:space:]]*\}/ s/SYSCTL_TWO/SYSCTL_ONE/' sysctl_net_ipv4.c
+          grep -A6 '\.procname.*tcp_ecn' sysctl_net_ipv4.c
+          sed -i 's/net->ipv4.sysctl_tcp_pacing_ss_ratio = 200;/net->ipv4.sysctl_tcp_pacing_ss_ratio = 160;/' tcp_ipv4.c
+          sed -i 's/net->ipv4.sysctl_tcp_pacing_ca_ratio = 120;/net->ipv4.sysctl_tcp_pacing_ca_ratio = 110;/' tcp_ipv4.c
+          grep "sysctl_tcp_pacing" tcp_ipv4.c
+          ls -t | grep -E 'tcp_|sysctl_'
 
       - name: Validate gki_defconfig for BBR and KernelSU Configurations
         run: |
