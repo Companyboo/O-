@@ -138,7 +138,7 @@ jobs:
           echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
           sed -i "s/DKSU_VERSION=11998/DKSU_VERSION=${KSU_VERSION}/" Makefile
 
-      - name: Apply SUSFS Patches
+     - name: Apply SUSFS Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG/kernel_platform"
@@ -153,8 +153,10 @@ jobs:
           cd ./KernelSU-Next
           
           echo "Applying next SUSFS patches..."
-          cp ../../../kernel_patches/next/0001-kernel-patch-susfs-v1.5.5-to-KernelSU-Next-v1.0.5.patch ./
-          patch -p1 --forward < 0001-kernel-patch-susfs-v1.5.5-to-KernelSU-Next-v1.0.5.patch || true
+          #cp ../../../kernel_patches/next/0001-kernel-patch-susfs-v1.5.5-to-KernelSU-Next-v1.0.5.patch ./
+          #patch -p1 --forward < 0001-kernel-patch-susfs-v1.5.5-to-KernelSU-Next-v1.0.5.patch || true
+          curl -O https://raw.githubusercontent.com/Bouteillepleine/kernel_patches/main/next/kernel-implement-susfs-v1.5.7-gki.patch
+          patch -p1 --forward < kernel-implement-susfs-v1.5.7-gki.patch || true
           
           # Change to common directory and apply SUSFS patch
           cd ../common
@@ -252,8 +254,7 @@ jobs:
           sed -i 's/qdisc_create_dflt(txq, \&mq_qdisc_ops, TC_H_ROOT, NULL);/qdisc_create_dflt(txq, \&fq_qdisc_ops, TC_H_ROOT, NULL);/' ./common/net/sched/sch_generic.c
           sed -i '/^[[:space:]]*default "bbr" if DEFAULT_BBR$/s/"bbr"/"bbr3"/' ./common/net/ipv4/Kconfig          
 
-      - name: Force ECN + Reduce overhead
-        #if: ${{ inputs.kernel_version == '6.6' }}
+      - name: Force ECN + Reduce overhead       
         run: |
           cd "$CONFIG/kernel_platform/common/net/ipv4"
           sed -i 's/net->ipv4.sysctl_tcp_ecn = 2;/net->ipv4.sysctl_tcp_ecn = 1;/' tcp_ipv4.c
